@@ -125,7 +125,7 @@ jobs:
           fi
 
       - name: Build Android APK
-        run: npx --yes @tauri-apps/cli android build -- --apk
+        run: npx --yes @tauri-apps/cli android build --apk
 
       - name: Sign APK
         run: |
