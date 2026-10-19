@@ -46,10 +46,12 @@ jobs:
       - name: Generate icons
         shell: bash
         run: |
-          if [ -f app-icon.png ]; then
-            npx tauri icon app-icon.png --output src-tauri/icons || echo "Icon generation failed, continuing"
+          if [ -f src-tauri/icons/32x32.png ]; then
+            echo "Icons already present, skipping generation"
+          elif [ -f app-icon.png ]; then
+            npx --yes @tauri-apps/cli icon app-icon.png --output src-tauri/icons || echo "Icon generation failed, continuing"
           else
-            echo "No app-icon.png found"
+            echo "No app-icon.png and no icons directory"
           fi
           mkdir -p src-tauri/icons
           if [ ! -f src-tauri/icons/32x32.png ]; then
@@ -70,10 +72,14 @@ jobs:
           releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}
+          # Prefer deb on Linux for better desktop integration (file associations, icons)
+          # AppImage is also produced by default
 
   build-android:
     runs-on: ubuntu-latest
     needs: build-desktop
+    permissions:
+      contents: write
 
     steps:
       - uses: actions/checkout@v5
@@ -95,11 +101,18 @@ jobs:
       - name: Install frontend dependencies
         run: npm install
 
+      - name: Init Android (if needed)
+        run: npx --yes @tauri-apps/cli android init || true
+
       - name: Generate icons
         shell: bash
         run: |
           if [ -f app-icon.png ]; then
-            npx tauri icon app-icon.png --output src-tauri/icons || echo "Icon generation failed, continuing"
+            npx --yes @tauri-apps/cli icon app-icon.png --output src-tauri/icons || echo "Icon generation failed, continuing"
+            # Generate Android icons into the Android project
+            if [ -d src-tauri/gen/android ]; then
+              npx --yes @tauri-apps/cli icon app-icon.png || echo "Android icon gen failed"
+            fi
           else
             echo "No app-icon.png found"
           fi
@@ -111,11 +124,8 @@ jobs:
             touch src-tauri/icons/icon.ico src-tauri/icons/icon.icns
           fi
 
-      - name: Init Android (if needed)
-        run: npm run tauri android init || true
-
       - name: Build Android APK
-        run: npm run tauri android build -- --apk
+        run: npx --yes @tauri-apps/cli android build -- --apk
 
       - name: Sign APK
         run: |
