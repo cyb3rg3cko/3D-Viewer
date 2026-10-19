@@ -60,6 +60,7 @@ jobs:
 
   build-android:
     runs-on: ubuntu-latest
+    needs: build-desktop
 
     steps:
       - uses: actions/checkout@v5
@@ -90,8 +91,38 @@ jobs:
       - name: Build Android APK
         run: npm run tauri android build -- --apk
 
-      - name: Upload Android APK
+      - name: Sign APK
+        run: |
+          echo "${{ secrets.ANDROID_KEY_BASE64 }}" | base64 -d > keystore.jks
+          UNSIGNED=$(find src-tauri/gen/android/app/build/outputs/apk -name "*unsigned*.apk" | head -1)
+          if [ -z "$UNSIGNED" ]; then
+            echo "No unsigned APK found"
+            exit 1
+          fi
+          SIGNED="${UNSIGNED%-unsigned.apk}-signed.apk"
+          ${ANDROID_HOME}/build-tools/$(ls ${ANDROID_HOME}/build-tools | tail -1)/zipalign -v -p 4 "$UNSIGNED" aligned.apk
+          ${ANDROID_HOME}/build-tools/$(ls ${ANDROID_HOME}/build-tools | tail -1)/apksigner sign \
+            --ks keystore.jks \
+            --ks-key-alias "${{ secrets.ANDROID_KEY_ALIAS }}" \
+            --ks-pass pass:"${{ secrets.ANDROID_KEY_PASSWORD }}" \
+            --key-pass pass:"${{ secrets.ANDROID_KEY_PASSWORD }}" \
+            --out "$SIGNED" \
+            aligned.apk
+          echo "Signed APK: $SIGNED"
+          # Replace the upload path to use the signed one
+          mkdir -p signed-output
+          cp "$SIGNED" signed-output/3d-viewer-signed.apk
+
+      - name: Upload Android APK to Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v__VERSION__
+          files: signed-output/*.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Android APK as Artifact
         uses: actions/upload-artifact@v6
         with:
           name: android-apk
-          path: src-tauri/gen/android/app/build/outputs/apk/universal/release/*.apk
+          path: signed-output/*.apk
