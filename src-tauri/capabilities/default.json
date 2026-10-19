@@ -8,6 +8,9 @@
     "fs:default",
     "fs:allow-read-file",
     "fs:allow-exists",
-    "fs:scope-allow-any"
+    "fs:scope-home",
+    "fs:scope-desktop",
+    "fs:scope-document",
+    "fs:scope-download"
   ]
 }
