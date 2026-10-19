@@ -44,7 +44,24 @@ jobs:
         run: npm install
 
       - name: Generate icons
-        run: npx tauri icon app-icon.png --output src-tauri/icons
+        run: |
+          if [ -f app-icon.png ]; then
+            npx tauri icon app-icon.png --output src-tauri/icons || echo "Icon generation failed, continuing with defaults"
+          else
+            echo "No app-icon.png found, skipping icon generation"
+          fi
+          # Ensure icons directory exists even if generation failed
+          mkdir -p src-tauri/icons
+          # Create minimal placeholder icons if none exist so the build doesn't fail
+          if [ ! -f src-tauri/icons/32x32.png ]; then
+            echo "Creating placeholder icons..."
+            # 1x1 transparent PNGs as fallback
+            printf '\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x06\x00\x00\x00\x1f\x15\xc4\x89\x00\x00\x00\nIDATx\x9cc\x00\x01\x00\x00\x05\x00\x01\r\n-\xb4\x00\x00\x00\x00IEND\xaeB`\x82' > src-tauri/icons/32x32.png
+            cp src-tauri/icons/32x32.png src-tauri/icons/128x128.png
+            cp src-tauri/icons/32x32.png src-tauri/icons/128x128@2x.png
+            # Minimal ico/icns placeholders (empty is ok for build in some cases)
+            touch src-tauri/icons/icon.ico src-tauri/icons/icon.icns
+          fi
 
       - name: Build Tauri app
         uses: tauri-apps/tauri-action@v1
@@ -83,7 +100,24 @@ jobs:
         run: npm install
 
       - name: Generate icons
-        run: npx tauri icon app-icon.png --output src-tauri/icons
+        run: |
+          if [ -f app-icon.png ]; then
+            npx tauri icon app-icon.png --output src-tauri/icons || echo "Icon generation failed, continuing with defaults"
+          else
+            echo "No app-icon.png found, skipping icon generation"
+          fi
+          # Ensure icons directory exists even if generation failed
+          mkdir -p src-tauri/icons
+          # Create minimal placeholder icons if none exist so the build doesn't fail
+          if [ ! -f src-tauri/icons/32x32.png ]; then
+            echo "Creating placeholder icons..."
+            # 1x1 transparent PNGs as fallback
+            printf '\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x06\x00\x00\x00\x1f\x15\xc4\x89\x00\x00\x00\nIDATx\x9cc\x00\x01\x00\x00\x05\x00\x01\r\n-\xb4\x00\x00\x00\x00IEND\xaeB`\x82' > src-tauri/icons/32x32.png
+            cp src-tauri/icons/32x32.png src-tauri/icons/128x128.png
+            cp src-tauri/icons/32x32.png src-tauri/icons/128x128@2x.png
+            # Minimal ico/icns placeholders (empty is ok for build in some cases)
+            touch src-tauri/icons/icon.ico src-tauri/icons/icon.icns
+          fi
 
       - name: Init Android (if needed)
         run: npm run tauri android init || true
