@@ -44,7 +44,7 @@ jobs:
         run: npm install
 
       - name: Generate icons
-        run: npx tauri icon app-icon.png
+        run: npx tauri icon app-icon.png --output src-tauri/icons
 
       - name: Build Tauri app
         uses: tauri-apps/tauri-action@v1
@@ -83,7 +83,7 @@ jobs:
         run: npm install
 
       - name: Generate icons
-        run: npx tauri icon app-icon.png
+        run: npx tauri icon app-icon.png --output src-tauri/icons
 
       - name: Init Android (if needed)
         run: npm run tauri android init || true
