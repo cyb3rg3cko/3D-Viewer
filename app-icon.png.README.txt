@@ -1,0 +1,8 @@
+# Place your source icon here as app-icon.png (recommended 1024×1024 or larger, square PNG).
+
+The GitHub Actions workflow runs `npx tauri icon app-icon.png` which generates all required sizes into `src-tauri/icons/`.
+
+Locally you can do the same:
+```bash
+npx tauri icon app-icon.png
+```

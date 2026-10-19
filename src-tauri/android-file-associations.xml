@@ -1,0 +1,19 @@
+<!-- Additional Android intent filters for file associations.
+     Tauri generates the main AndroidManifest.xml; this can be merged or used as reference.
+     Place in src-tauri/gen/android/app/src/main/AndroidManifest.xml after first `tauri android init`,
+     or use a custom AndroidManifest.xml override if preferred.
+-->
+<!--
+<intent-filter>
+    <action android:name="android.intent.action.VIEW" />
+    <category android:name="android.intent.category.DEFAULT" />
+    <category android:name="android.intent.category.BROWSABLE" />
+    <data android:mimeType="model/gltf-binary" />
+    <data android:mimeType="model/stl" />
+    <data android:pathPattern=".*\\.glb" />
+    <data android:pathPattern=".*\\.gltf" />
+    <data android:pathPattern=".*\\.fbx" />
+    <data android:pathPattern=".*\\.vrm" />
+    <data android:pathPattern=".*\\.stl" />
+</intent-filter>
+-->
