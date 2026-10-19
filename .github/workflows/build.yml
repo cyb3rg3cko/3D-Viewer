@@ -113,10 +113,14 @@ jobs:
           mkdir -p signed-output
           cp "$SIGNED" signed-output/3d-viewer-signed.apk
 
+      - name: Get version
+        id: version
+        run: echo "version=$(node -p "require('./src-tauri/tauri.conf.json').version")" >> $GITHUB_OUTPUT
+
       - name: Upload Android APK to Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v__VERSION__
+          tag_name: v${{ steps.version.outputs.version }}
           files: signed-output/*.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
