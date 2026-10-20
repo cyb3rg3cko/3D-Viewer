@@ -1,0 +1,10 @@
+[Desktop Entry]
+Categories=Graphics;3DGraphics;Viewer;
+Comment=View 3D models
+Exec={{exec}} %U
+Icon={{icon}}
+Name={{name}}
+Terminal=false
+Type=Application
+MimeType=model/gltf-binary;model/stl;application/octet-stream;
+StartupWMClass={{name}}

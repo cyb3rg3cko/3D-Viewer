@@ -35,6 +35,13 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
+    "shortDescription": "3D model viewer",
+    "longDescription": "View GLB, FBX, VRM, and STL 3D models",
+    "linux": {
+      "deb": {
+        "desktopTemplate": "desktop-template.desktop"
+      }
+    },
     "fileAssociations": [
       {
         "ext": ["glb", "gltf"],
