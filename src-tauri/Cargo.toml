@@ -1,6 +1,6 @@
 [package]
 name = "threed-viewer"
-version = "0.1.0"
+version = "0.2.0"
 description = "Simple offline 3D model viewer"
 authors = ["CYB3RG3CKO"]
 edition = "2021"
