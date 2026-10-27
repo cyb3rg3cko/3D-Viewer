@@ -7,12 +7,12 @@ pub fn run() {
         .plugin(tauri_plugin_fs::init())
         .setup(|app| {
             let args: Vec<String> = std::env::args().collect();
-            if args.len() > 1 {
-                let file_path = args[1].clone();
+            // Find the first argument that looks like a file path (not a flag)
+            let file_path = args.iter().skip(1).find(|a| !a.starts_with('-')).cloned();
+            if let Some(file_path) = file_path {
                 println!("File argument received: {}", file_path);
                 let app_handle = app.handle().clone();
                 std::thread::spawn(move || {
-                    // Emit multiple times to catch the frontend whenever it's ready
                     for delay in [500, 1500, 3000, 5000] {
                         std::thread::sleep(std::time::Duration::from_millis(delay));
                         println!("Emitting open-file event (delay {}ms)", delay);
