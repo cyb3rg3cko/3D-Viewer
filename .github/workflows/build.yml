@@ -34,6 +34,11 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Update single-instance plugin
+        run: |
+          cd src-tauri
+          cargo update -p tauri-plugin-single-instance
+
       - name: Install Linux dependencies
         if: matrix.platform == 'ubuntu-22.04'
         run: |
@@ -72,8 +77,6 @@ jobs:
           releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}
-          # Prefer deb on Linux for better desktop integration (file associations, icons)
-          # AppImage is also produced by default
 
   build-android:
     runs-on: ubuntu-latest
@@ -109,7 +112,6 @@ jobs:
         run: |
           if [ -f app-icon.png ]; then
             npx --yes @tauri-apps/cli icon app-icon.png --output src-tauri/icons || echo "Icon generation failed, continuing"
-            # Generate Android icons into the Android project
             if [ -d src-tauri/gen/android ]; then
               npx --yes @tauri-apps/cli icon app-icon.png || echo "Android icon gen failed"
             fi
@@ -145,7 +147,6 @@ jobs:
             --out "$SIGNED" \
             aligned.apk
           echo "Signed APK: $SIGNED"
-          # Replace the upload path to use the signed one
           mkdir -p signed-output
           cp "$SIGNED" signed-output/3d-viewer-signed.apk
 
