@@ -9,9 +9,12 @@ pub fn run() {
             let args: Vec<String> = std::env::args().collect();
             if args.len() > 1 {
                 let file_path = args[1].clone();
+                println!("File argument received: {}", file_path);
                 let app_handle = app.handle().clone();
                 std::thread::spawn(move || {
-                    std::thread::sleep(std::time::Duration::from_millis(800));
+                    // Wait for the frontend to be ready
+                    std::thread::sleep(std::time::Duration::from_millis(1500));
+                    println!("Emitting open-file event");
                     let _ = app_handle.emit("open-file", file_path);
                 });
             }

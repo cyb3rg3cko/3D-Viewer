@@ -1,0 +1,79 @@
+name: Build Desktop
+
+on:
+  push:
+    tags:
+      - 'Desktop_v*'
+      - 'Desktop_V*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-desktop:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: windows-latest
+            args: ''
+          - platform: ubuntu-22.04
+            args: ''
+
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Update single-instance plugin
+        run: |
+          cd src-tauri
+          cargo update -p tauri-plugin-single-instance
+
+      - name: Install Linux dependencies
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+      - name: Install frontend dependencies
+        run: npm install
+
+      - name: Generate icons
+        shell: bash
+        run: |
+          if [ -f src-tauri/icons/32x32.png ]; then
+            echo "Icons already present, skipping generation"
+          elif [ -f app-icon.png ]; then
+            npx --yes @tauri-apps/cli icon app-icon.png --output src-tauri/icons || echo "Icon generation failed, continuing"
+          else
+            echo "No app-icon.png and no icons directory"
+          fi
+          mkdir -p src-tauri/icons
+          if [ ! -f src-tauri/icons/32x32.png ]; then
+            printf '\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x06\x00\x00\x00\x1f\x15\xc4\x89\x00\x00\x00\nIDATx\x9cc\x00\x01\x00\x00\x05\x00\x01\r\n-\xb4\x00\x00\x00\x00IEND\xaeB`\x82' > src-tauri/icons/32x32.png
+            cp src-tauri/icons/32x32.png src-tauri/icons/128x128.png
+            cp src-tauri/icons/32x32.png src-tauri/icons/128x128@2x.png
+            touch src-tauri/icons/icon.ico src-tauri/icons/icon.icns
+          fi
+
+      - name: Build Tauri app
+        uses: tauri-apps/tauri-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: '3D Viewer ${{ github.ref_name }}'
+          releaseBody: 'See the assets to download and install this version.'
+          releaseDraft: false
+          prerelease: false
+          args: ${{ matrix.args }}
