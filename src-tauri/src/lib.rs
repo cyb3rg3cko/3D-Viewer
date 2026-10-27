@@ -12,10 +12,12 @@ pub fn run() {
                 println!("File argument received: {}", file_path);
                 let app_handle = app.handle().clone();
                 std::thread::spawn(move || {
-                    // Wait for the frontend to be ready
-                    std::thread::sleep(std::time::Duration::from_millis(1500));
-                    println!("Emitting open-file event");
-                    let _ = app_handle.emit("open-file", file_path);
+                    // Emit multiple times to catch the frontend whenever it's ready
+                    for delay in [500, 1500, 3000, 5000] {
+                        std::thread::sleep(std::time::Duration::from_millis(delay));
+                        println!("Emitting open-file event (delay {}ms)", delay);
+                        let _ = app_handle.emit("open-file", file_path.clone());
+                    }
                 });
             }
             Ok(())
