@@ -1,3 +1,9 @@
+# Update
+
+This Repo is going to be stale, but i will leave it up in case someone wants to use the code. I struggled getting the Tauri to associate with file extensions and open the file when one was double clicked. I changed to wrapping the three.js script in Electron and Capacitor -> https://github.com/cyb3rg3cko/3D-Viewer-Electron-Capacitor
+
+***
+
 # 3D Viewer
 
 Simple offline 3D model viewer for GLB, FBX, VRM, and STL files.
