@@ -4777,6 +4777,25 @@ Supported: glb, gltf, fbx, vrm, stl`),URL.revokeObjectURL(e))}Wr.addEventListene
     }
   });
 }
+
+async function pollForFile() {
+  try {
+    const { invoke } = await import('@tauri-apps/api/core');
+    const path = await invoke('get_pending_file');
+    console.log('Pending file:', path);
+    if (path) {
+      const { readFile } = await import('@tauri-apps/plugin-fs');
+      const data = await readFile(path);
+      const name = path.split(/[/\\]/).pop() || 'model';
+      const file = new File([data], name);
+      if (typeof Ia === 'function') Ia(file);
+    }
+  } catch (err) {
+    console.error('pollForFile failed', err);
+  }
+}
+setTimeout(pollForFile, 500);
+
 function Sp(){requestAnimationFrame(Sp),Gr.update(),ji.render(Ai,Zi)}Sp();Ep();
 /*! Bundled license information:
 
